@@ -72,6 +72,7 @@ void DebugCamera::Update()
 	up = Vector3::Transform(up, rt.Invert());
 
 	m_view = Matrix::CreateLookAt(eye, target, up);
+
 }
 
 //--------------------------------------------------------------------------------------

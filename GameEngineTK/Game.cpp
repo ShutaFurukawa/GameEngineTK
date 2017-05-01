@@ -51,7 +51,7 @@ void Game::Initialize(HWND window, int width, int height)
 	m_view = Matrix::CreateLookAt(Vector3(2.f, 2.f, 2.f),
 		Vector3::Zero, Vector3::UnitY);
 	m_proj = Matrix::CreatePerspectiveFieldOfView(XM_PI / 4.f,
-		float(m_outputWidth) / float(m_outputHeight), 0.1f, 10.f);
+		float(m_outputWidth) / float(m_outputHeight), 0.1f, 500.f);
 
 	//エフェクトに行列をセット
 	m_effect->SetView(m_view);
@@ -71,6 +71,16 @@ void Game::Initialize(HWND window, int width, int height)
 
 	//デバッグカメラの生成
 	m_debugCamera = std::make_unique<DebugCamera>(m_outputWidth, m_outputHeight);
+
+	//エフェクトファクトリ生成
+	m_factory = std::make_unique<EffectFactory>(m_d3dDevice.Get());
+	//テクスチャの読み込みパス指定
+	m_factory->SetDirectory(L"Resources");
+	//モデルの読み込みと生成
+	m_modelGround = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\Glound1m.cmo", *m_factory);
+	m_modelSky = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\SkyDoom.cmo", *m_factory);
+	m_modelSky2 = Model::CreateFromCMO(m_d3dDevice.Get(), L"Resources\\Sky2.cmo", *m_factory);
+
 }
 
 // Executes the basic game loop.
@@ -97,6 +107,74 @@ void Game::Update(DX::StepTimer const& timer)
 
 	//ビュー行列を取得
 	m_view = m_debugCamera->GetCameraMatrix();
+
+	m_rotmat += 0.025f;
+	m_rotmaty += 0.5f;
+
+	//球のワールド行列作成
+	//スケール
+	Matrix scalemat1 = Matrix::CreateScale(1.0f);
+	Matrix scalemat2 = Matrix::CreateScale(0.5f);
+	Matrix scalemat3 = Matrix::CreateScale(2.5f);
+
+	//回転
+	//ピッチ
+	Matrix rotmatx = Matrix::CreateRotationX(XMConvertToRadians(0.0f));
+	//ロール
+	Matrix rotmatz = Matrix::CreateRotationZ(XMConvertToRadians(0.0f));
+	//ヨー
+	Matrix rotmaty1[10];
+	Matrix rotmaty2[10];
+	Matrix rotmaty3;
+	Matrix rotmaty0;
+
+	//回転の合成
+	Matrix rot1[10];
+	Matrix rot2[10];
+	Matrix rot3;
+	Matrix rot0;
+
+	for (int i = 0; i < 10; i++)
+	{
+		rotmaty1[i] = Matrix::CreateRotationY(XMConvertToRadians(36.0f * i) + m_rotmat);
+		rot1[i]= rotmatx * rotmaty1[i] * rotmatz;
+		rotmaty2[i] = Matrix::CreateRotationY(XMConvertToRadians(36.0f * i) - m_rotmat);
+		rot2[i] = rotmatx * rotmaty2[i] * rotmatz;
+
+	}
+
+	rotmaty3 = Matrix::CreateRotationY(XMConvertToRadians(m_rotmaty));
+	rot3 = rotmatx * rotmaty3 * rotmatz;
+	rotmaty0 = Matrix::CreateRotationY(XMConvertToRadians(0.0f));
+	rot0 = rotmatx * rotmaty0 * rotmatz;
+
+	//平行移動
+	Matrix transmat[21];
+	Matrix transmatG[100][100];
+
+	for (int i = 0; i < 10; i++)
+	{
+		//平行移動の行列
+		transmat[i] = Matrix::CreateTranslation(15.0f, 0.0f, 0.0f);
+		transmat[10 + i] = Matrix::CreateTranslation(30.0f, 0.0f, 0.0f);
+
+		//ワールド行列の合成
+		m_worldBall[i] = scalemat2 * transmat[i] * rot1[i];
+		m_worldBall[10 + i] = scalemat1 * transmat[10 + i] * rot2[i];
+	}
+
+	transmat[20] = Matrix::CreateTranslation(0.0f, 0.0f, 0.0f);
+	m_worldBall[20] = scalemat3 * transmat[20] * rot3;
+
+	for (int i = 0; i < 100; i++)
+	{
+		for (int j = 0; j < 100; j++)
+		{
+			transmatG[i][j] = Matrix::CreateTranslation(1.0f * j, 0.0f, 1.0f * i);
+			m_worldGround[i][j] = scalemat1*transmatG[i][j] * rot0;
+		}
+	}
+
 }
 
 // Draws the scene.
@@ -113,42 +191,64 @@ void Game::Render()
     // TODO: Add your rendering code here.
 
 	//描画はここ
-	//状態
+
+	////状態
 	DirectX::CommonStates m_states(m_d3dDevice.Get());
 
-	m_d3dContext->OMSetBlendState(m_states.Opaque(), nullptr, 0xFFFFFFFF);
-	m_d3dContext->OMSetDepthStencilState(m_states.DepthNone(), 0);
-	//カリングを設定する
-	m_d3dContext->RSSetState(m_states.Wireframe());
+	//モデルの描画
+	m_modelGround->Draw(m_d3dContext.Get(), m_states, m_world, m_view, m_proj);
 
-	//行列をセット
-	m_effect->SetWorld(m_world);
-	m_effect->SetView(m_view);
-	m_effect->SetProjection(m_proj);
+	m_modelSky->Draw(m_d3dContext.Get(), m_states, m_world, m_view, m_proj);
 
-
-	m_effect->Apply(m_d3dContext.Get());
-	m_d3dContext->IASetInputLayout(m_inputLayout.Get());
-
-	//頂点データ
-	uint16_t indices[] =
+	for (int i = 0; i < 10; i++)
 	{
-		0,1,2,
-		2,1,3,
-	};
+		//球モデルの描画
+		m_modelSky2->Draw(m_d3dContext.Get(), m_states, m_worldBall[i], m_view, m_proj);
+		m_modelSky2->Draw(m_d3dContext.Get(), m_states, m_worldBall[10 + i], m_view, m_proj);
+	}
+	m_modelSky2->Draw(m_d3dContext.Get(), m_states, m_worldBall[20], m_view, m_proj);
 
-	VertexPositionNormal vertices[] =
-	{
-		{ Vector3(-1.0f,+1.0f,0.0f),Vector3(0.0f,0.0f,+1.0f) },
-		{ Vector3(-1.0f,-1.0f,0.0f),Vector3(0.0f,0.0f,+1.0f) },
-		{ Vector3(+1.0f,+1.0f,0.0f),Vector3(0.0f,0.0f,+1.0f) },
-		{ Vector3(+1.0f,-1.0f,0.0f),Vector3(0.0f,0.0f,+1.0f) },
+	//for (int i = 0; i < 100; i++)
+	//{
+	//	for (int j = 0; j < 100; j++)
+	//	{
+	//		m_modelGround->Draw(m_d3dContext.Get(), m_states, m_worldGround[i][j], m_view, m_proj);
+	//	}
+	//}
 
-	};
+	//m_d3dContext->OMSetBlendState(m_states.Opaque(), nullptr, 0xFFFFFFFF);
+	//m_d3dContext->OMSetDepthStencilState(m_states.DepthNone(), 0);
+	////カリングを設定する
+	//m_d3dContext->RSSetState(m_states.Wireframe());
+
+	////行列をセット
+	//m_effect->SetWorld(m_world);
+	//m_effect->SetView(m_view);
+	//m_effect->SetProjection(m_proj);
+
+
+	//m_effect->Apply(m_d3dContext.Get());
+	//m_d3dContext->IASetInputLayout(m_inputLayout.Get());
+
+	////頂点データ
+	//uint16_t indices[] =
+	//{
+	//	0,1,2,
+	//	2,1,3,
+	//};
+
+	//VertexPositionNormal vertices[] =
+	//{
+	//	{ Vector3(-1.0f,+1.0f,0.0f),Vector3(0.0f,0.0f,+1.0f) },
+	//	{ Vector3(-1.0f,-1.0f,0.0f),Vector3(0.0f,0.0f,+1.0f) },
+	//	{ Vector3(+1.0f,+1.0f,0.0f),Vector3(0.0f,0.0f,+1.0f) },
+	//	{ Vector3(+1.0f,-1.0f,0.0f),Vector3(0.0f,0.0f,+1.0f) },
+
+	//};
 
 
 
-	m_batch->Begin();
+	//m_batch->Begin();
 
 	//線の描画
 	//m_batch->DrawLine(VertexPositionColor(SimpleMath::Vector3(0, 0, 0), SimpleMath::Color(1, 1, 1)), VertexPositionColor(SimpleMath::Vector3(800, 600, 0), SimpleMath::Color(1, 1, 1)));
@@ -165,12 +265,13 @@ void Game::Render()
 
 	//m_batch->DrawTriangle(v1, v2, v3);
 
-	//四角形
-	m_batch->DrawIndexed(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, indices, 6, vertices, 4);
+	////四角形
+	//m_batch->DrawIndexed(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, indices, 6, vertices, 4);
 
-	m_batch->End();
+	//m_batch->End();
 
     Present();
+
 }
 
 // Helper method to clear the back buffers.
