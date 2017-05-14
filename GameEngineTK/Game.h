@@ -14,6 +14,7 @@
 #include <SimpleMath.h>
 
 #include <Model.h>
+#include "Camera.h"
 
 
 // A basic game implementation that creates a D3D11 device and
@@ -86,24 +87,55 @@ private:
 	//デバッグカメラ
 	std::unique_ptr<DebugCamera> m_debugCamera;
 
+	//キーボード情報
+	std::unique_ptr<DirectX::Keyboard> keyboard;
+
 	//エフェクトファクトリの作成
 	std::unique_ptr<DirectX::EffectFactory> m_factory;
 	//モデルの作成
 	std::unique_ptr<DirectX::Model> m_modelGround;
 	std::unique_ptr<DirectX::Model> m_modelSky;
 	std::unique_ptr<DirectX::Model> m_modelSky2;
+	std::unique_ptr<DirectX::Model> m_modelteaput;
+	std::unique_ptr<DirectX::Model> m_head;
 
 	//球ワールド行列
 	DirectX::SimpleMath::Matrix m_worldBall[21];
-	//地面ワールド行列
-	DirectX::SimpleMath::Matrix m_worldGround[100][100];
+	//ティーワールド行列
+	DirectX::SimpleMath::Matrix m_wordTae[20];
 
-	std::unique_ptr<DirectX::SpriteFont> m_font;
+	//std::unique_ptr<DirectX::SpriteFont> m_font;
 
 	DirectX::SimpleMath::Vector2 m_fontPos;
-	std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
+	//std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
 
+	//回転量
 	float m_rotmat = 0.0f;
 	float m_rotmaty = 0.0f;
+
+	//移動量
+	float m_trance[20];
+	float m_trancex[20];
+	float m_trancez[20];
+
+	//スケール
+	float val;
+
+	//原点位置
+	DirectX::SimpleMath::Vector3 m_origin;
+
+	//原点への移動変数
+	float m_toOriginX[20];
+	float m_toOroginZ[20];
+
+	//カメラ
+	std::unique_ptr<Camera> m_Camera;
+
+	//自機のワールド行列
+	DirectX::SimpleMath::Matrix m_tankWolrd;
+	//自機の座標
+	DirectX::SimpleMath::Vector3 tank_pos;
+	//回転量
+	float m_rotVal = 0.0f;
 
 };

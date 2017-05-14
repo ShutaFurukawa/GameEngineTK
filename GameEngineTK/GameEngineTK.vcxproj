@@ -162,12 +162,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="DebugCamera.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="StepTimer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DebugCamera.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -194,8 +196,11 @@
   </ItemGroup>
   <ItemGroup>
     <MeshContentTask Include="Assets\Glound1m.FBX" />
+    <MeshContentTask Include="Assets\glound200M.FBX" />
+    <MeshContentTask Include="Assets\head.FBX" />
     <MeshContentTask Include="Assets\Sky2.FBX" />
     <MeshContentTask Include="Assets\SkyDoom.FBX" />
+    <MeshContentTask Include="Assets\taeput.FBX" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
