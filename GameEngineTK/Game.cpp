@@ -98,7 +98,7 @@ void Game::Initialize(HWND window, int width, int height)
 	m_origin = Vector3(0, 0, 0);
 
 	//カメラの生成
-	m_Camera = std::make_unique<Camera>();
+	m_Camera = std::make_unique<Camera>(m_outputWidth, m_outputHeight);
 }
 
 // Executes the basic game loop.
@@ -128,9 +128,6 @@ void Game::Update(DX::StepTimer const& timer)
 
 	//ビュー行列を取得
 	//m_view = m_debugCamera->GetCameraMatrix();
-	m_Camera->update();
-	m_view = m_Camera->GetViewMatrix();
-	m_proj = m_Camera->GetProjMatrix();
 
 	////どこから見るのか（視点）
 	//Vector3 eyePos(0, 0, 5.0f);
@@ -159,95 +156,95 @@ void Game::Update(DX::StepTimer const& timer)
 	//m_proj = Matrix::CreatePerspectiveFieldOfView(fovY, aspect, nearClip, farClip);
 
 	
-	//回転
-	m_rotmat += 0.025f;
-	m_rotmaty += 1.0f;
+	////回転
+	//m_rotmat += 0.025f;
+	//m_rotmaty += 1.0f;
 
-	//sinfによるスケールの変更
-	val = sinf(m_rotmat / 2) + 1.0f;
+	////sinfによるスケールの変更
+	//val = sinf(m_rotmat / 2) + 1.0f;
 
-	//ティーポットの行列の設定
-	//平行移動
-	Matrix transmatTae[20];
-	//スケール
-	Matrix scalemat = Matrix::CreateScale(val + 0.25f);
-	//回転
-	Matrix rotx = Matrix::CreateRotationX(XMConvertToRadians(0.0f));
-	Matrix roty = Matrix::CreateRotationY(XMConvertToRadians(m_rotmaty));
-	Matrix rotz = Matrix::CreateRotationZ(XMConvertToRadians(0.0f));
-	//回転の合成
-	Matrix rot;
-	rot = rotx * roty * rotz;
-
-
-	//球のワールド行列作成
-	//スケール
-	Matrix scalemat1 = Matrix::CreateScale(1.0f);
-	Matrix scalemat2 = Matrix::CreateScale(0.5f);
-	Matrix scalemat3 = Matrix::CreateScale(2.5f);
-
-	//回転
-	//ピッチ
-	Matrix rotmatx = Matrix::CreateRotationX(XMConvertToRadians(0.0f));
-	//ロール
-	Matrix rotmatz = Matrix::CreateRotationZ(XMConvertToRadians(0.0f));
-	//ヨー
-	Matrix rotmaty1[10];
-	Matrix rotmaty2[10];
-	Matrix rotmaty3;
-	Matrix rotmaty0;
-
-	//回転の合成
-	Matrix rot1[10];
-	Matrix rot2[10];
-	Matrix rot3;
-	Matrix rot0;
-
-	rotmaty3 = Matrix::CreateRotationY(XMConvertToRadians(m_rotmaty));
-	rot3 = rotmatx * rotmaty3 * rotmatz;
-	rotmaty0 = Matrix::CreateRotationY(XMConvertToRadians(0.0f));
-	rot0 = rotmatx * rotmaty0 * rotmatz;
-
-	//配列
-	for (int i = 0; i < 10; i++)
-	{
-		rotmaty1[i] = Matrix::CreateRotationY(XMConvertToRadians(36.0f * i) + m_rotmat);
-		rot1[i]= rotmatx * rotmaty1[i] * rotmatz;
-		rotmaty2[i] = Matrix::CreateRotationY(XMConvertToRadians(36.0f * i) - m_rotmat);
-		rot2[i] = rotmatx * rotmaty2[i] * rotmatz;
-
-	}
+	////ティーポットの行列の設定
+	////平行移動
+	//Matrix transmatTae[20];
+	////スケール
+	//Matrix scalemat = Matrix::CreateScale(val + 0.25f);
+	////回転
+	//Matrix rotx = Matrix::CreateRotationX(XMConvertToRadians(0.0f));
+	//Matrix roty = Matrix::CreateRotationY(XMConvertToRadians(m_rotmaty));
+	//Matrix rotz = Matrix::CreateRotationZ(XMConvertToRadians(0.0f));
+	////回転の合成
+	//Matrix rot;
+	//rot = rotx * roty * rotz;
 
 
+	////球のワールド行列作成
+	////スケール
+	//Matrix scalemat1 = Matrix::CreateScale(1.0f);
+	//Matrix scalemat2 = Matrix::CreateScale(0.5f);
+	//Matrix scalemat3 = Matrix::CreateScale(2.5f);
 
-	//平行移動
-	Matrix transmat[21];
+	////回転
+	////ピッチ
+	//Matrix rotmatx = Matrix::CreateRotationX(XMConvertToRadians(0.0f));
+	////ロール
+	//Matrix rotmatz = Matrix::CreateRotationZ(XMConvertToRadians(0.0f));
+	////ヨー
+	//Matrix rotmaty1[10];
+	//Matrix rotmaty2[10];
+	//Matrix rotmaty3;
+	//Matrix rotmaty0;
 
-	transmat[20] = Matrix::CreateTranslation(0.0f, 0.0f, 0.0f);
-	m_worldBall[20] = scalemat3 * transmat[20] * rot3;
+	////回転の合成
+	//Matrix rot1[10];
+	//Matrix rot2[10];
+	//Matrix rot3;
+	//Matrix rot0;
 
-	for (int i = 0; i < 10; i++)
-	{
-		//平行移動の行列
-		transmat[i] = Matrix::CreateTranslation(15.0f, 0.0f, 0.0f);
-		transmat[10 + i] = Matrix::CreateTranslation(30.0f, 0.0f, 0.0f);
+	//rotmaty3 = Matrix::CreateRotationY(XMConvertToRadians(m_rotmaty));
+	//rot3 = rotmatx * rotmaty3 * rotmatz;
+	//rotmaty0 = Matrix::CreateRotationY(XMConvertToRadians(0.0f));
+	//rot0 = rotmatx * rotmaty0 * rotmatz;
 
-		//ワールド行列の合成
-		m_worldBall[i] = scalemat2 * transmat[i] * rot1[i];
-		m_worldBall[10 + i] = scalemat1 * transmat[10 + i] * rot2[i];
-	}
+	////配列
+	//for (int i = 0; i < 10; i++)
+	//{
+	//	rotmaty1[i] = Matrix::CreateRotationY(XMConvertToRadians(36.0f * i) + m_rotmat);
+	//	rot1[i]= rotmatx * rotmaty1[i] * rotmatz;
+	//	rotmaty2[i] = Matrix::CreateRotationY(XMConvertToRadians(36.0f * i) - m_rotmat);
+	//	rot2[i] = rotmatx * rotmaty2[i] * rotmatz;
+
+	//}
 
 
-	//ティーポットのワールド行列
-	for (int i = 0; i < 20; i++)
-	{
-		//原点へ移動
-		//if()
 
-		//各要素を行列へ変換
-		transmatTae[i] = Matrix::CreateTranslation(m_trancex[i] * m_trance[i], 0.0f, m_trancez[i] * m_trance[i]);
-		m_wordTae[i] = scalemat * rot * transmatTae[i];
-	}
+	////平行移動
+	//Matrix transmat[21];
+
+	//transmat[20] = Matrix::CreateTranslation(0.0f, 0.0f, 0.0f);
+	//m_worldBall[20] = scalemat3 * transmat[20] * rot3;
+
+	//for (int i = 0; i < 10; i++)
+	//{
+	//	//平行移動の行列
+	//	transmat[i] = Matrix::CreateTranslation(15.0f, 0.0f, 0.0f);
+	//	transmat[10 + i] = Matrix::CreateTranslation(30.0f, 0.0f, 0.0f);
+
+	//	//ワールド行列の合成
+	//	m_worldBall[i] = scalemat2 * transmat[i] * rot1[i];
+	//	m_worldBall[10 + i] = scalemat1 * transmat[10 + i] * rot2[i];
+	//}
+
+
+	////ティーポットのワールド行列
+	//for (int i = 0; i < 20; i++)
+	//{
+	//	//原点へ移動
+	//	//if()
+
+	//	//各要素を行列へ変換
+	//	transmatTae[i] = Matrix::CreateTranslation(m_trancex[i] * m_trance[i], 0.0f, m_trancez[i] * m_trance[i]);
+	//	m_wordTae[i] = scalemat * rot * transmatTae[i];
+	//}
 
 	//Ｗキーが押されていたら
 	if (key.W)
@@ -275,12 +272,21 @@ void Game::Update(DX::StepTimer const& timer)
 	{
 		//自機の回転量の設定
 		m_rotVal += 0.05f;
+		////どこを見るのか(注視点)
+		Vector3 refPos(m_rotVal, 0, 0);
+		//視点をセット
+		m_Camera->SetRefPos(refPos);
+
 	}
 	//自機を回転させる
 	else if (key.D)
 	{
 		//自機の回転量の設定
 		m_rotVal += -0.05f;
+		////どこを見るのか(注視点)
+		Vector3 refPos(m_rotVal, 0, 0);
+		//視点をセット
+		m_Camera->SetRefPos(refPos);
 	}
 
 
@@ -289,6 +295,11 @@ void Game::Update(DX::StepTimer const& timer)
 	Matrix rotaitemat = Matrix::CreateRotationY(m_rotVal);
 	m_tankWolrd = rotaitemat * transemat;
 
+
+	//ビュー行列、射影行列を作成
+	m_Camera->update();
+	m_view = m_Camera->GetViewMatrix();
+	m_proj = m_Camera->GetProjMatrix();
 
 
 }

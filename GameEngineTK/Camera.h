@@ -25,7 +25,7 @@ protected:
 	//どちらが画面上方向か（上方向ベクトル）
 	DirectX::SimpleMath::Vector3 m_upVec;
 
-	static float m_angle;
+	float m_angle;
 
 
 	//射影行列

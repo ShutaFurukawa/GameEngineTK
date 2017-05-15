@@ -19,15 +19,15 @@ using namespace DirectX::SimpleMath;
 Camera::Camera(int width, int hight)
 {
 	//メンバ変数の初期化
+	m_angle = 0.0f;
+
 	//ビュー行列
 	//どこから見るのか（視点）
 	m_eyePos = Vector3(0, 0, 5.0f);
 	//どこを見るのか(注視点)
 	m_refPos = Vector3(0, 0, -0.5f);
 	//どちらが画面上方向か（上方向ベクトル）
-	m_upVec = Vector3(cosf(m_angle), sinf(m_angle), 0);
-
-	m_angle = 0.0f;
+	m_upVec = Vector3(0, 1, 0);
 
 	//射影行列
 	//垂直方向視野角

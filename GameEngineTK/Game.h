@@ -14,6 +14,8 @@
 #include <SimpleMath.h>
 
 #include <Model.h>
+#include <Keyboard.h>
+
 #include "Camera.h"
 
 
