@@ -98,7 +98,7 @@ void Game::Initialize(HWND window, int width, int height)
 	m_origin = Vector3(0, 0, 0);
 
 	//カメラの生成
-	m_Camera = std::make_unique<Camera>(m_outputWidth, m_outputHeight);
+	m_FollowCamera = std::make_unique<FollowCamera>(m_outputWidth, m_outputHeight);
 }
 
 // Executes the basic game loop.
@@ -272,21 +272,12 @@ void Game::Update(DX::StepTimer const& timer)
 	{
 		//自機の回転量の設定
 		m_rotVal += 0.05f;
-		////どこを見るのか(注視点)
-		Vector3 refPos(m_rotVal, 0, 0);
-		//視点をセット
-		m_Camera->SetRefPos(refPos);
-
 	}
 	//自機を回転させる
 	else if (key.D)
 	{
 		//自機の回転量の設定
 		m_rotVal += -0.05f;
-		////どこを見るのか(注視点)
-		Vector3 refPos(m_rotVal, 0, 0);
-		//視点をセット
-		m_Camera->SetRefPos(refPos);
 	}
 
 
@@ -295,13 +286,13 @@ void Game::Update(DX::StepTimer const& timer)
 	Matrix rotaitemat = Matrix::CreateRotationY(m_rotVal);
 	m_tankWolrd = rotaitemat * transemat;
 
+	m_FollowCamera->SetTargetPos(tank_pos);
+	m_FollowCamera->SetTargetAngle(m_rotVal);
 
 	//ビュー行列、射影行列を作成
-	m_Camera->update();
-	m_view = m_Camera->GetViewMatrix();
-	m_proj = m_Camera->GetProjMatrix();
-
-
+	m_FollowCamera->update();
+	m_view = m_FollowCamera->GetViewMatrix();
+	m_proj = m_FollowCamera->GetProjMatrix();
 }
 
 // Draws the scene.

@@ -16,7 +16,7 @@
 #include <Model.h>
 #include <Keyboard.h>
 
-#include "Camera.h"
+#include "FollowCamerah.h"
 
 
 // A basic game implementation that creates a D3D11 device and
@@ -131,7 +131,7 @@ private:
 	float m_toOroginZ[20];
 
 	//カメラ
-	std::unique_ptr<Camera> m_Camera;
+	std::unique_ptr<FollowCamera> m_FollowCamera;
 
 	//自機のワールド行列
 	DirectX::SimpleMath::Matrix m_tankWolrd;
@@ -139,5 +139,7 @@ private:
 	DirectX::SimpleMath::Vector3 tank_pos;
 	//回転量
 	float m_rotVal = 0.0f;
+
+	//カメラ切り替えよう
 
 };

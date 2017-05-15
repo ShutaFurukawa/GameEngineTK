@@ -70,31 +70,32 @@ void Camera::update()
 }
 
 //ビュー行列取得関数------------------------------------------------------------
-Matrix Camera::GetViewMatrix()
+//constと参照を使うことでコピーを防ぐ
+const Matrix& Camera::GetViewMatrix()
 {
 	return m_view;
 }
 
 //射影行列取得関数--------------------------------------------------------------
-Matrix Camera::GetProjMatrix()
+const Matrix& Camera::GetProjMatrix()
 {
 	return m_proj;
 }
 
 //視点のセット関数--------------------------------------------------------------
-void Camera::SetEyePos(Vector3 eyepos)
+void Camera::SetEyePos(const Vector3& eyepos)
 {
 	m_eyePos = eyepos;
 }
 
 //注視点のセット関数------------------------------------------------------------
-void Camera::SetRefPos(Vector3 refpos)
+void Camera::SetRefPos(const Vector3& refpos)
 {
 	m_refPos = refpos;
 }
 
 //上方向ベクトルのセット関数----------------------------------------------------
-void Camera::SetUpVec(Vector3 uppos)
+void Camera::SetUpVec(const Vector3& uppos)
 {
 	m_upVec = uppos;
 }

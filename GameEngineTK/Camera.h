@@ -52,20 +52,21 @@ public:
 	virtual ~Camera();
 
 	//更新関数
-	void update();
+	virtual void update();
 
 	//ビュー行列を取得
-	DirectX::SimpleMath::Matrix GetViewMatrix();
+	//constと参照を渡すことで処理が軽くなる
+	const DirectX::SimpleMath::Matrix& GetViewMatrix();
 
 	//射影行列を取得
-	DirectX::SimpleMath::Matrix GetProjMatrix();
+	const DirectX::SimpleMath::Matrix& GetProjMatrix();
 
 	//視点をセットする関数
-	void SetEyePos(DirectX::SimpleMath::Vector3 eyepos);
+	void SetEyePos(const DirectX::SimpleMath::Vector3& eyepos);
 	//注視点をセットする関数
-	void SetRefPos(DirectX::SimpleMath::Vector3 refpos);
+	void SetRefPos(const DirectX::SimpleMath::Vector3& refpos);
 	//上方向ベクトルをセットする関数
-	void SetUpVec(DirectX::SimpleMath::Vector3 uppos);
+	void SetUpVec(const DirectX::SimpleMath::Vector3& uppos);
 	//垂直方向視野角をセットする関数
 	void SetFovY(float fovy);
 	//アスペクト比をセットする関数
