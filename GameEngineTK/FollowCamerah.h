@@ -11,6 +11,7 @@
 #pragma once
 
 #include "Camera.h"
+#include <Keyboard.h>
 
 class FollowCamera : public Camera
 {
@@ -19,6 +20,12 @@ private:
 	DirectX::SimpleMath::Vector3 m_target_pos;
 	//追従座標の回転角
 	float m_target_amgle;
+	//キーボード
+	DirectX::Keyboard* m_keyboard;
+	//キーボードトラッカー
+	DirectX::Keyboard::KeyboardStateTracker m_keyboardTracker;
+	//カメラ切り替えのフラグ
+	bool chengeFlag;
 	
 public:
 	//追従対象とカメラの距離
@@ -32,5 +39,7 @@ public:
 	void SetTargetPos(const DirectX::SimpleMath::Vector3& targetpos);
 	//追従対象の回転角をセットする関数
 	void SetTargetAngle(float targetangle);
+	//キーボードをセット
+	void SetKeyBoard(DirectX::Keyboard* keyboard);
 
 };

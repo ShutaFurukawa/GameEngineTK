@@ -99,6 +99,7 @@ void Game::Initialize(HWND window, int width, int height)
 
 	//ƒJƒƒ‰‚Ì¶¬
 	m_FollowCamera = std::make_unique<FollowCamera>(m_outputWidth, m_outputHeight);
+	m_FollowCamera->SetKeyBoard(keyboard.get());
 }
 
 // Executes the basic game loop.
