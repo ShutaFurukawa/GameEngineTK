@@ -12,11 +12,14 @@
 #include <Effects.h>
 #include <CommonStates.h>
 #include <SimpleMath.h>
+#include <vector>
 
 #include <Model.h>
 #include <Keyboard.h>
 
 #include "FollowCamerah.h"
+#include "Obj3D.h"
+
 
 
 // A basic game implementation that creates a D3D11 device and
@@ -24,6 +27,18 @@
 class Game
 {
 public:
+
+	enum PlayerParts
+	{
+		PLAYER_PARTS_TUNK,
+		PLAYER_PARTS_WAIST,
+		PLAYER_PARTS_BODY,
+		PLAYER_PARTS_FIRE,
+		HEAD,
+		DRIL,
+
+		PLAYER_PARTS_NUM
+	};
 
     Game();
 
@@ -94,51 +109,30 @@ private:
 
 	//エフェクトファクトリの作成
 	std::unique_ptr<DirectX::EffectFactory> m_factory;
-	//モデルの作成
-	std::unique_ptr<DirectX::Model> m_modelGround;
-	std::unique_ptr<DirectX::Model> m_modelSky;
-	std::unique_ptr<DirectX::Model> m_modelSky2;
-	std::unique_ptr<DirectX::Model> m_modelteaput;
-	std::unique_ptr<DirectX::Model> m_head;
 
-	//球ワールド行列
-	DirectX::SimpleMath::Matrix m_worldBall[21];
-	//ティーワールド行列
-	DirectX::SimpleMath::Matrix m_wordTae[20];
+	//モデルの作成
+	Obje3D m_ObjeGround;
+	Obje3D m_ObjeSky;
 
 	//std::unique_ptr<DirectX::SpriteFont> m_font;
 
 	DirectX::SimpleMath::Vector2 m_fontPos;
 	//std::unique_ptr<DirectX::SpriteBatch> m_spriteBatch;
 
-	//回転量
-	float m_rotmat = 0.0f;
-	float m_rotmaty = 0.0f;
-
-	//移動量
-	float m_trance[20];
-	float m_trancex[20];
-	float m_trancez[20];
-
-	//スケール
-	float val;
-
-	//原点位置
-	DirectX::SimpleMath::Vector3 m_origin;
-
-	//原点への移動変数
-	float m_toOriginX[20];
-	float m_toOroginZ[20];
-
 	//カメラ
 	std::unique_ptr<FollowCamera> m_FollowCamera;
 
 	//自機のワールド行列
 	DirectX::SimpleMath::Matrix m_tankWolrd;
+	//自機のワールド行列2
+	DirectX::SimpleMath::Matrix m_tankWolrd2;
 	//自機の座標
 	DirectX::SimpleMath::Vector3 tank_pos;
 	//回転量
 	float m_rotVal = 0.0f;
+
+	//自機の3Dオブジェクト
+	std::vector<Obje3D> m_ObjePlayer;
 
 	//カメラ切り替えよう
 
